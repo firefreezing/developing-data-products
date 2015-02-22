@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Measure Machine Learning Classifier Performance</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Measure Machine Learning Classifier Performance">
+  <meta name="author" content="firefreezing">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Measure Machine Learning Classifier Performance</h1>
+    <h2>is &quot;accuracy&quot; THE criterion to evaluate agreement?</h2>
+    <p>firefreezing<br/>data miner</p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <article data-timings="">
+    <!-- Limit image width and height -->
+
+<style type='text/css'>
+img {
+    max-height: 560px;
+    max-width: 964px;
+}
+</style>
+
+<!-- Center image on slide -->
+
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+
+<script type='text/javascript'>
+$(function() {
+    $("p:has(img)").addClass('centered');
+});
+</script>
+
+<h2>Classifier and Confusion Matrix</h2>
+
+<p>In a standard machine learning setting, the result of a classification algorithm (or classifier) can be presented by a confusion matrix: </p>
+
+<div style='text-align: center;'>
+    <img height='300' src='./figure./confMat.png' />
+</div>
+
+<ul>
+<li><p>One way to evaluate classifier performance is by <strong>accuracy</strong></p></li>
+<li><p>Accuracy = (TP + TN)/population</p></li>
+<li><p>Question: is accuracy always a good indicator of agreement between the classifier and the truth?</p></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Example: Outcome with High Accuracy</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Confusion matrix of a classifier X on 10,000 test data:</p>
+
+<div style='text-align: center;'>
+    <img height='150' src='./figure./confMatExample.png' />
+</div>
+
+<p>Classifier X has a high &quot;accuracy&quot;:</p>
+
+<pre><code class="r">(100 + 9025)/10000
+</code></pre>
+
+<pre><code>## [1] 0.9125
+</code></pre>
+
+<p>But does this classifier really perform such fantastic?</p>
+
+<ul>
+<li>the data has a very rare positive cases (5%), which are likely what we&#39;d like to correctly identify</li>
+<li>for these rare postive cases, the classifier only has a 20% success rate! </li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Alternative Measurement: Kappa Statistic</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Kappa statistic is an alternative measurement to report concordance and it accounts for the situation that the classifer agrees with the truth just by chance. </p>
+
+<div style='float:left;width:48%;' class='centered'>
+  <ul>
+<li>Kappa statistic can be viewed as a corrected version of accuracy</li>
+<li>Kappa lies on a -1 to 1 scale, where 1 is perfect agreement, 0 is exactly what would be expect by chance and -1 indicates perfect disagreement. </li>
+<li>Math formulation:</li>
+</ul>
+
+<p>\(\text{P}_{\text{obs}} = \frac{\text{TP + TN}}{\text{population}}\) </p>
+
+<p>\(\text{P}_{\text{exp}} = \frac{\text{TP + FN}}{\text{Population}} * \frac{\text{TP + FP}}{\text{Population}} + \frac{\text{FN + TN}}{\text{Population}} * \frac{\text{FP + TN}}{\text{Population}}\)</p>
+
+<p>\(\kappa = \frac{\text{P}_{\text{obs}} - \text{P}_{\text{exp}}}{1 - \text{P}_{\text{exp}}}\)</p>
+
+</div>
+<div style='float:right;width:48%;'>
+  <div style='text-align: center;'>
+    <img height='300' src='./figure./confMat.png' />
+</div>
+
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Previous Example: a Re-evaluation with Kappa</h2>
+  </hgroup>
+  <article data-timings="">
+    <div style='text-align: center;'>
+    <img height='150' src='./figure./confMatExample.png' />
+</div>
+
+<p>Calculate the kappa statistic:</p>
+
+<pre><code class="r">TP = 100; FP = 475; FN = 400; TN = 9025; total &lt;- TP + FP + FN + TN
+p_obs &lt;- (TP + TN)/total; p_exp &lt;- (TP + FN)*(TP + FP)/total^2 + (FN + TN)*(FP + TN)/total^2
+kappa &lt;- (p_obs - p_exp)/(1 - p_exp)
+round(kappa, 2)
+</code></pre>
+
+<pre><code>## [1] 0.14
+</code></pre>
+
+<p>Kappa indicates that the performance of classifier X is not superb - 0.14 is close to 0! This is consistent with our intuition. </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title=''>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Example: Outcome with High Accuracy'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Alternative Measurement: Kappa Statistic'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Previous Example: a Re-evaluation with Kappa'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script> -->
+  <script>window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="libraries/widgets/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"><\/script>')
+</script>
+<!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
