@@ -1,4 +1,4 @@
-# developing-data-products
+## developing-data-products
 This branch includes 5 slides of presentation using slidify. 
 
 The slidify code is saved in index.Rmd
